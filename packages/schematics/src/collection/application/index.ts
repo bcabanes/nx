@@ -236,6 +236,13 @@ function updateProject(options: NormalizedSchema): Rule {
           return host;
         }
 
+        if (options.e2eTestRunner === 'cypress') {
+          host.delete(`${options.e2eProjectRoot}/src/app.e2e-spec.ts`);
+          host.delete(`${options.e2eProjectRoot}/src/app.po.ts`);
+          host.delete(`${options.e2eProjectRoot}/protractor.conf.js`);
+          host.delete(`${options.e2eProjectRoot}/tsconfig.e2e.json`);
+        }
+
         const karma = host
           .read(`${options.appProjectRoot}/karma.conf.js`)
           .toString();
@@ -307,7 +314,13 @@ export default function(schema: Schema): Rule {
       excludeUnnecessaryFiles(),
 
       move(options.e2eProjectName, options.e2eProjectRoot),
-      updateE2eProject(options),
+
+      options.e2eTestRunner === 'protractor'
+        ? updateE2eProject(options)
+        : noop(),
+      options.e2eTestRunner === 'cypress'
+        ? schematic('cypress-project', options)
+        : noop(),
 
       move(options.name, options.appProjectRoot),
       updateProject(options),
