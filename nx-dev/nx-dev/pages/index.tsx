@@ -8,6 +8,7 @@ import {
   Header,
   InlineCommand,
   NxUsersShowcase,
+  FeatureList,
 } from '@nrwl/nx-dev/ui/common';
 import { sendCustomEvent } from '@nrwl/nx-dev/feature-analytics';
 
@@ -238,6 +239,11 @@ export function Index() {
                 </p>
               </div>
             </div>
+          </div>
+
+          {/*NX FEATURES*/}
+          <div className="max-w-screen-lg xl:max-w-screen-xl mx-auto px-5 py-5">
+            <FeatureList />
           </div>
 
           <div className="bg-blue-nx-base text-white">
