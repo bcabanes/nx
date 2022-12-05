@@ -10,7 +10,7 @@ nx g page my-page --project=my-app
 {% /tab %}
 {% tab label="Create dynamic page in an app" %}
 
-The following creates a page under `apps/my-app/pages/products/[id].tsx`.
+The following creates a page under `apps/my-app/pages/products/[...segments].tsx`.
 
 ```shell
 nx g page "[id]" --project=my-app --directory=products

@@ -1,5 +1,7 @@
-import { Menu, MenuItem, MenuSection } from '@nrwl/nx-dev/models-menu';
-import { PackageMetadata, SchemaMetadata } from '@nrwl/nx-dev/models-package';
+import {
+  PackageMetadata,
+  ProcessedPackageMetadata,
+} from '@nrwl/nx-dev/models-package';
 import { Breadcrumbs, Footer } from '@nrwl/nx-dev/ui-common';
 import { renderMarkdown } from '@nrwl/nx-dev/ui-markdoc';
 import { NextSeo } from 'next-seo';
@@ -9,53 +11,29 @@ import { Heading1 } from './ui/headings';
 import { PackageReference } from './ui/package-reference';
 
 export function PackageSchemaList({
-  menu,
+  overview,
   pkg,
 }: {
-  menu: Menu;
-  navIsOpen: boolean;
-  pkg: PackageMetadata;
+  overview: string;
+  pkg: ProcessedPackageMetadata;
 }): JSX.Element {
   const router = useRouter();
 
-  function getGuides(id: string, sections: MenuSection[]): MenuItem | null {
-    const target = sections.find((x) => x.id === id);
-    if (!target) return null;
-    return target.itemList.find((y) => y.id === id + '-guides') || null;
-  }
-
   const vm: {
-    package: {
-      name: string;
-      description: string;
-      githubUrl: string;
-      id: string;
-      readme: { content: string; filePath: string };
-      guides: MenuItem | null;
-      executors: SchemaMetadata[];
-      generators: SchemaMetadata[];
-    };
+    package: PackageMetadata;
+    githubUrl: string;
     seo: { title: string; description: string; url: string; imageUrl: string };
     markdown: ReactNode;
   } = {
     package: {
-      name: pkg.packageName,
-      description: pkg.description,
-      githubUrl: pkg.githubRoot + pkg.root,
-      id: pkg.name,
-      get readme() {
-        const hasOverview = pkg.documentation.find((d) => d.id === 'overview');
-        return !!hasOverview
-          ? {
-              content: hasOverview.content,
-              filePath: hasOverview.file,
-            }
-          : { content: '', filePath: '' };
-      },
-      guides: getGuides(pkg.name, menu.sections),
-      executors: pkg.executors,
-      generators: pkg.generators,
+      ...pkg,
+      documents: Object.keys(pkg.documents)
+        .map((k) => pkg.documents[k])
+        .filter((d) => d.id !== 'overview'),
+      executors: Object.keys(pkg.executors).map((k) => pkg.executors[k]),
+      generators: Object.keys(pkg.generators).map((k) => pkg.generators[k]),
     },
+    githubUrl: pkg.githubRoot + pkg.root,
     seo: {
       title: `${pkg.packageName} | Nx`,
       description: pkg.description,
@@ -64,12 +42,9 @@ export function PackageSchemaList({
         .replace(/\//gi, '-')}.jpg`,
       url: 'https://nx.dev' + router.asPath,
     },
-    get markdown(): ReactNode {
-      return renderMarkdown(
-        this.package.readme.content || this.package.description,
-        { filePath: this.package.readme.filePath }
-      );
-    },
+    markdown: renderMarkdown(overview, {
+      filePath: pkg.documents['overview'] ? pkg.documents['overview'].file : '',
+    }).node,
   };
 
   return (
@@ -111,7 +86,7 @@ export function PackageSchemaList({
               </div>
               <div className="relative z-0 inline-flex flex-shrink-0">
                 <a
-                  href={vm.package.githubUrl}
+                  href={vm.githubUrl}
                   target="_blank"
                   rel="noreferrer"
                   aria-hidden="true"
@@ -140,8 +115,7 @@ export function PackageSchemaList({
             </div>
 
             <PackageReference
-              name={vm.package.id}
-              guides={vm.package.guides}
+              documents={vm.package.documents}
               executors={vm.package.executors}
               generators={vm.package.generators}
             />
