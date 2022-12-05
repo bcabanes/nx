@@ -17,12 +17,13 @@ async function generate() {
       'generated',
       'cli'
     );
-    removeSync(commandsOutputDirectory);
-    await generateCnwDocumentation(commandsOutputDirectory);
-    await generateCliDocumentation(commandsOutputDirectory);
-
-    generateDevkitDocumentation();
-    await Promise.all(generatePackageSchemas());
+    // removeSync(commandsOutputDirectory);
+    // await generateCnwDocumentation(commandsOutputDirectory);
+    // await generateCliDocumentation(commandsOutputDirectory);
+    //
+    // generateDevkitDocumentation();
+    // await Promise.all(generatePackageSchemas());
+    await generatePackageSchemas();
 
     console.log(`\n${chalk.green('✓')} Generated Documentation\n`);
   } catch (e) {
@@ -52,7 +53,7 @@ function checkDocumentation() {
   }
 }
 
-generate().then(() => checkDocumentation());
+generate() /*.then(() => checkDocumentation())*/;
 
 function printInfo(
   str: string,
