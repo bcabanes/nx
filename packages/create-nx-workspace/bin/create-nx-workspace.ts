@@ -1185,7 +1185,7 @@ function pointToTutorialAndCourse(preset: Preset) {
       output.addVerticalSeparator();
       output.note({
         title,
-        bodyLines: [`https://nx.dev/node-tutorial/1-code-generation`],
+        bodyLines: [`https://nx.dev/getting-started/node-tutorial`],
       });
       break;
   }
